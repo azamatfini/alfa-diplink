@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Открыть Альфа-Банк — перевод по номеру телефона</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; }
+    #open { display:none; padding:12px 18px; font-size:16px; }
+    #msg { margin-bottom:12px; color:#333; }
+  </style>
+</head>
+<body>
+  <h3>Открыть Альфа-Банк — перевод по номеру телефона</h3>
+  <p id="msg">Пробуем открыть приложение...</p>
+  <button id="open">Открыть приложение (если ничего не произошло)</button>
+
+<script>
+(function(){
+  // intent-ссылка для перевода по номеру телефона
+  const intent = "intent://online.alfabank.ru/external_phone_transfer?recipientPhoneNumber=79091197110#Intent;scheme=https;package=ru.alfabank.mobile.android;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dru.alfabank.mobile.android;end";
+  const playUrl = "https://play.google.com/store/apps/details?id=ru.alfabank.mobile.android";
+  const btn = document.getElementById('open');
+  const msg = document.getElementById('msg');
+
+  // Попытки открыть intent: делаем несколько попыток с небольшими паузами.
+  // Это повышает шанс сработать на разных версиях Chrome/прошивках.
+  function tryOpen() {
+    // Первая прямая попытка
+    window.location = intent;
+
+    // Ещё одна попытка через 300ms (иногда помогает)
+    setTimeout(function(){
+      try { window.location = intent; } catch(e){ /* no-op */ }
+    }, 300);
+
+    // Если через 1200ms ничего не произошло — показываем кнопку и меняем сообщение
+    setTimeout(function(){
+      msg.textContent = "Если приложение не открылось автоматически — нажмите кнопку ниже.";
+      btn.style.display = "inline-block";
+    }, 1200);
+
+    // Защитный fallback: через 2500ms переходим на Play (если intent был проигнорирован)
+    setTimeout(function(){
+      // Откроем Play только если кнопка видна (т.е. автомат не сработал)
+      if (btn.style.display !== 'none') {
+        window.location = playUrl;
+      }
+    }, 2500);
+  }
+
+  // Авто-запуск после загрузки
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    tryOpen();
+  } else {
+    document.addEventListener('DOMContentLoaded', tryOpen);
+  }
+
+  // Ручной клик на кнопку
+  btn.addEventListener('click', function(){
+    msg.textContent = "Пытаемся открыть приложение...";
+    btn.style.display = 'none';
+    tryOpen();
+  });
+
+  // На случай жестких блокировок: реагируем на первый touch/click на странице
+  function userGestureHandler() {
+    // если пользователь взаимодействует со страницей, делаем ещё одну попытку
+    tryOpen();
+    document.removeEventListener('click', userGestureHandler);
+    document.removeEventListener('touchstart', userGestureHandler);
+  }
+  document.addEventListener('click', userGestureHandler);
+  document.addEventListener('touchstart', userGestureHandler);
+})();
+</script>
+</body>
+</html>
