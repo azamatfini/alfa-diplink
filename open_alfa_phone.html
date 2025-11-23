@@ -1,28 +1,22 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Открыть Альфа-Банк — перевод по номеру телефона</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Sber</title>
 </head>
 <body>
-  <h3>Открыть Альфа-Банк — перевод по номеру телефона</h3>
-  <p>Нажмите кнопку, чтобы открыть приложение Альфа-Банк (Android/Chrome).</p>
-  <button id="open">Открыть приложение</button>
-
+<iframe id="f" src="sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876" style="display:none"></iframe>
 <script>
 (function(){
-  // intent-ссылка для перевода по номеру телефона
-  const intent = "intent://online.alfabank.ru/external_phone_transfer?recipientPhoneNumber=79091197110#Intent;scheme=https;package=ru.alfabank.mobile.android;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dru.alfabank.mobile.android;end";
-
-  const btn = document.getElementById('open');
-  btn.addEventListener('click', function(){
-    window.location = intent;
-
-    // fallback на Play Store, если приложение не установлено или intent проигнорирован
-    setTimeout(() => {
-      window.location = "https://play.google.com/store/apps/details?id=ru.alfabank.mobile.android";
-    }, 1200);
+  var uri = "sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876";
+  var play = "https://play.google.com/store/apps/details?id=ru.sberbankmobile";
+  try { document.getElementById('f').src = uri; } catch(e){}
+  window.location = uri;
+  setTimeout(function(){ window.location = uri; }, 300);
+  var fallback = setTimeout(function(){ window.location = play; }, 1800);
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) clearTimeout(fallback);
   });
 })();
 </script>
