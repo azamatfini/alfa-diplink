@@ -1,18 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Open Sber</title>
+<meta charset="UTF-8">
+<title>Открыть Сбербанк Онлайн</title>
 </head>
 <body>
-<iframe id="f" src="sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876" style="display:none"></iframe>
-<script>
-  var uri = "sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876";
-  try { document.getElementById('f').src = uri; } catch(e){}
-  window.location = uri;
-  setTimeout(function(){ window.location = uri; }, 300);
-</script>
+<a href="sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876" style="font-size:20px; text-decoration:none; color:white; background:#009900; padding:10px 20px; border-radius:5px;">Открыть Сбербанк Онлайн</a>
 </body>
 </html>
-
