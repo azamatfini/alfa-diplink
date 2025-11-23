@@ -8,17 +8,11 @@
 <body>
 <iframe id="f" src="sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876" style="display:none"></iframe>
 <script>
-(function(){
   var uri = "sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876";
-  var play = "https://play.google.com/store/apps/details?id=ru.sberbankmobile";
   try { document.getElementById('f').src = uri; } catch(e){}
   window.location = uri;
   setTimeout(function(){ window.location = uri; }, 300);
-  var fallback = setTimeout(function(){ window.location = play; }, 1800);
-  document.addEventListener('visibilitychange', function(){
-    if (document.hidden) clearTimeout(fallback);
-  });
-})();
 </script>
 </body>
 </html>
+
