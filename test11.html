@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сбер - Альтернативные подходы</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+button { 
+    padding: 10px 15px; 
+    margin: 5px; 
+    background: #21a038; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    display: block;
+    width: 300px;
+}
+button:hover { background: #1a8030; }
+.link-group { margin: 20px 0; padding: 15px; border: 2px solid #cc0000; border-radius: 5px; background: #fff0f0; }
+.code { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 12px; }
+.status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+.info { background: #d1ecf1; color: #0c5460; }
+</style>
+</head>
+<body>
+<h1>Альтернативные подходы</h1>
+
+<div class="link-group">
+    <h3>1. Официальные Universal Links (App Links)</h3>
+    
+    <div class="code">https://online.sberbank.ru/transfers/overseas</div>
+    <button onclick="testLink(this)">Тест: Официальный сайт</button>
+    
+    <div class="code">https://www.sberbank.ru/retail/transfers/foreign</div>
+    <button onclick="testLink(this)">Тест: Резервная ссылка</button>
+</div>
+
+<div class="link-group">
+    <h3>2. Прямой вызов Activity (только Android)</h3>
+    
+    <div class="code">intent:#Intent;component=ru.sberbankmobile/.ui.transfers.overseas.OverseasTransferActivity;end</div>
+    <button onclick="testLink(this)">Тест: Прямой Activity</button>
+    
+    <div class="code">intent:#Intent;component=ru.sberbankmobile/.ui.transfers.overseas.OverseasTransferActivity;S.country=UZ;end</div>
+    <button onclick="testLink(this)">Тест: Activity + параметры</button>
+</div>
+
+<div class="link-group">
+    <h3>3. Специальные схемы для конкретных банков</h3>
+    
+    <div class="code">sberbankonline://transfer/to/bank/ASACUZ22</div>
+    <button onclick="testLink(this)">Тест: Перевод в конкретный банк</button>
+    
+    <div class="code">sberbankonline://international/transfer/UZ</div>
+    <button onclick="testLink(this)">Тест: Международный перевод</button>
+</div>
+
+<div class="link-group">
+    <h3>4. Резервный вариант - веб-версия с параметрами</h3>
+    
+    <div class="code">https://online.sberbank.ru/transfers/overseas?country=UZ&phone=998381916876</div>
+    <button onclick="testLink(this)">Тест: Веб-версия с параметрами</button>
+    
+    <div class="code">https://online.sberbank.ru/CSAFront/transfer/overseas.do?country=UZ</div>
+    <button onclick="testLink(this)">Тест: Старая версия</button>
+</div>
+
+<div id="status" class="status info">
+    <p><strong>Проблема:</strong> Все deeplink'ы возвращают "по ссылке ничего не нашлось"</p>
+    <p><strong>Возможные причины:</strong></p>
+    <ul>
+        <li>СберБанк отключил поддержку deeplink'ов для международных переводов</li>
+        <li>Требуется специальная аутентификация</li>
+        <li>Параметры должны передаваться в другом формате (не через URL)</li>
+        <li>Нужны специальные права или подпись приложения</li>
+    </ul>
+</div>
+
+<script>
+function testLink(button) {
+    const link = button.previousElementSibling.textContent;
+    const status = document.getElementById('status');
+    status.className = 'status info';
+    status.innerHTML = `<p>Пробуем: <code>${link}</code></p>`;
+    
+    console.log('Testing alternative:', link);
+    
+    // Пробуем открыть ссылку
+    setTimeout(() => {
+        window.location.href = link;
+    }, 100);
+}
+
+// Копирование ссылок
+document.querySelectorAll('.code').forEach(codeElement => {
+    codeElement.style.cursor = 'pointer';
+    codeElement.title = 'Нажмите для копирования';
+    codeElement.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.innerHTML = `<p>Ссылка скопирована: <code>${text}</code></p>`;
+        });
+    });
+});
+</script>
+
+<div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 5px;">
+    <h3>Рекомендации:</h3>
+    <ol>
+        <li><strong>Обратиться в поддержку Сбера</strong> - спросить о поддержке deeplink'ов</li>
+        <li><strong>Использовать веб-версию</strong> с предзаполненными параметрами</li>
+        <li><strong>Рассмотреть альтернативные банки</strong> которые лучше поддерживают deeplink'и</li>
+        <li><strong>Создать свое приложение-прослойку</strong> которое будет открывать Сбер с нужными параметрами</li>
+    </ol>
+    
+    <p>К сожалению, без доступа к внутренней документации Сбера или работающим примерам, дальнейшие попытки могут быть бесполезны.</p>
+</div>
+
+</body>
+</html>
