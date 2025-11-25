@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сбер - Новый формат на основе данных коллег</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+button { 
+    padding: 10px 15px; 
+    margin: 5px; 
+    background: #21a038; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    display: block;
+    width: 280px;
+}
+button:hover { background: #1a8030; }
+.link-group { margin: 20px 0; padding: 15px; border: 2px solid #ff6b00; border-radius: 5px; background: #fff8f0; }
+.code { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 12px; }
+.status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+.info { background: #d1ecf1; color: #0c5460; }
+.success { background: #d4edda; color: #155724; }
+</style>
+</head>
+<body>
+<h1>Новый формат на основе данных коллег</h1>
+<p>Используем путь: <code>/transfers/overseas/foreignbank</code></p>
+
+<div class="link-group">
+    <h3>1. Базовый путь foreignbank</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Базовый foreignbank</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: androidapp (без дефиса)</button>
+</div>
+
+<div class="link-group">
+    <h3>2. Параметры в пути (сегменты URL)</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank/UZ</div>
+    <button onclick="testLink(this)">Тест: foreignbank/UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank/UZ/ASACUZ22</div>
+    <button onclick="testLink(this)">Тест: foreignbank/UZ/ASACUZ22</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank/UZ/ASACUZ22/998381916876</div>
+    <button onclick="testLink(this)">Тест: foreignbank/UZ/банк/телефон</button>
+</div>
+
+<div class="link-group">
+    <h3>3. Intent с foreignbank путем</h3>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas/foreignbank/UZ#Intent;scheme=android-app;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent + foreignbank/UZ</button>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas/foreignbank/UZ/ASACUZ22#Intent;scheme=android-app;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent + foreignbank/UZ/банк</button>
+</div>
+
+<div class="link-group">
+    <h3>4. Двойной androidapp (как в примере коллег)</h3>
+    
+    <div class="code">androidapp://ru.sberbankmobile/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Двойной androidapp</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank/UZ</div>
+    <button onclick="testLink(this)">Тест: Двойной + UZ</button>
+</div>
+
+<div class="link-group">
+    <h3>5. Параметры как часть пути с префиксами</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank?country=UZ</div>
+    <button onclick="testLink(this)">Тест: foreignbank?country=UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/foreignbank?country=UZ&bank=ASACUZ22&phone=998381916876</div>
+    <button onclick="testLink(this)">Тест: foreignbank?все параметры</button>
+</div>
+
+<div class="link-group">
+    <h3>6. Альтернативные схемы с foreignbank</h3>
+    
+    <div class="code">sberbankonline://transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: sberbankonline + foreignbank</button>
+    
+    <div class="code">sbolonline://transfers/overseas/foreignbank/UZ</div>
+    <button onclick="testLink(this)">Тест: sbolonline + foreignbank/UZ</button>
+</div>
+
+<div id="status" class="status info">
+    <p><strong>Новая информация от коллег:</strong></p>
+    <ul>
+        <li>Путь: <code>/transfers/overseas/foreignbank</code></li>
+        <li>Схема: <code>androidapp://</code> (без дефиса)</li>
+        <li>Двойной путь в примере: <code>androidapp://{id}/androidapp/{id}/transfers/overseas/foreignbank</code></li>
+    </ul>
+    <p><strong>Цель:</strong> Найти работающую комбинацию пути и параметров</p>
+</div>
+
+<script>
+function testLink(button) {
+    const link = button.previousElementSibling.textContent;
+    const status = document.getElementById('status');
+    status.className = 'status info';
+    status.innerHTML = `<p>Тестируем: <code>${link}</code></p>`;
+    
+    console.log('Testing new format:', link);
+    
+    // Создаем iframe для обхода блокировок
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = link;
+    document.body.appendChild(iframe);
+    
+    // Также пробуем стандартный метод
+    setTimeout(() => {
+        window.location.href = link;
+    }, 50);
+    
+    // Удаляем iframe и показываем инструкцию
+    setTimeout(() => {
+        document.body.removeChild(iframe);
+        status.innerHTML += '<p>Проверьте в приложении:</p>' +
+            '<ul>' +
+            '<li>✅ Открылся ли экран перевода в Узбекистан</li>' +
+            '<li>❌ Открылся выбор страны</li>' +
+            '<li>🔄 Открылся другой экран (опишите какой)</li>' +
+            '</ul>';
+    }, 1500);
+}
+
+// Копирование ссылок
+document.querySelectorAll('.code').forEach(codeElement => {
+    codeElement.style.cursor = 'pointer';
+    codeElement.title = 'Нажмите для копирования';
+    codeElement.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.innerHTML = `<p>Ссылка скопирована: <code>${text}</code></p>`;
+        });
+    });
+});
+</script>
+
+</body>
+</html>
