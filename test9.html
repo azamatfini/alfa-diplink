@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сбер - Поиск правильных параметров</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+button { 
+    padding: 10px 15px; 
+    margin: 5px; 
+    background: #21a038; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    display: block;
+    width: 250px;
+}
+button:hover { background: #1a8030; }
+.link-group { margin: 20px 0; padding: 15px; border: 2px solid #21a038; border-radius: 5px; background: #f8fff9; }
+.code { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 12px; }
+.status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+.info { background: #d1ecf1; color: #0c5460; }
+.success { background: #d4edda; color: #155724; }
+</style>
+</head>
+<body>
+<h1>Поиск правильного формата параметров для Сбера</h1>
+
+<div class="link-group">
+    <h3>1. Параметры как в веб-версии (закодированные)</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ</div>
+    <button onclick="testLink(this)">Тест: recipient:country=UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ&recipient%3Abank=ASACUZ22</div>
+    <button onclick="testLink(this)">Тест: + банк</button>
+</div>
+
+<div class="link-group">
+    <h3>2. Параметры без кодирования (опасно, но возможно)</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipient:country=UZ</div>
+    <button onclick="testLink(this)">Тест: recipient:country=UZ (без кодирования)</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipient:country=UZ&recipient:bank=ASACUZ22</div>
+    <button onclick="testLink(this)">Тест: + банк (без кодирования)</button>
+</div>
+
+<div class="link-group">
+    <h3>3. Альтернативные названия параметров</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?country=UZ</div>
+    <button onclick="testLink(this)">Тест: country=UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?countryCode=UZ</div>
+    <button onclick="testLink(this)">Тест: countryCode=UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?destinationCountry=UZ</div>
+    <button onclick="testLink(this)">Тест: destinationCountry=UZ</button>
+</div>
+
+<div class="link-group">
+    <h3>4. Параметры в формате JSON</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?params={"country":"UZ"}</div>
+    <button onclick="testLink(this)">Тест: JSON страна</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?data={"country":"UZ","bank":"ASACUZ22","phone":"998381916876"}</div>
+    <button onclick="testLink(this)">Тест: JSON все параметры</button>
+</div>
+
+<div class="link-group">
+    <h3>5. Параметры через Intent (специальный формат)</h3>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas?S.country=UZ#Intent;scheme=android-app;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent S.country</button>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas?S.recipientCountry=UZ#Intent;scheme=android-app;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent S.recipientCountry</button>
+</div>
+
+<div class="link-group">
+    <h3>6. Параметры как фрагмент URL</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas#country=UZ</div>
+    <button onclick="testLink(this)">Тест: Fragment country=UZ</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas#recipient:country=UZ</div>
+    <button onclick="testLink(this)">Тест: Fragment recipient:country=UZ</button>
+</div>
+
+<div id="status" class="status info">
+    <p><strong>Текущая проблема:</strong> Ссылки открывают Сбер, но не предзаполняют страну Узбекистан</p>
+    <p><strong>Задача:</strong> Найти правильный формат параметров для предзаполнения</p>
+    <p><strong>Инструкция:</strong> Тестируйте по порядку, отмечайте любые изменения в поведении приложения</p>
+</div>
+
+<script>
+function testLink(button) {
+    const link = button.previousElementSibling.textContent;
+    const status = document.getElementById('status');
+    status.className = 'status info';
+    status.innerHTML = `<p>Тестируем: <code>${link}</code></p>`;
+    
+    console.log('Testing:', link);
+    
+    // Пробуем открыть ссылку
+    setTimeout(() => {
+        window.location.href = link;
+    }, 100);
+    
+    // Ждем и возвращаем фокус на страницу
+    setTimeout(() => {
+        status.innerHTML += '<p>Вернитесь в браузер и сообщите результат:</p>' +
+            '<ul>' +
+            '<li>✅ Страна предзаполнилась как Узбекистан</li>' +
+            '<li>❌ Открылся выбор страны (параметры не работают)</li>' +
+            '<li>⚡ Приложение упало/ошибка</li>' +
+            '</ul>';
+        window.focus();
+    }, 2000);
+}
+
+// Копирование ссылок
+document.querySelectorAll('.code').forEach(codeElement => {
+    codeElement.style.cursor = 'pointer';
+    codeElement.title = 'Нажмите для копирования';
+    codeElement.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.innerHTML = `<p>Ссылка скопирована: <code>${text}</code></p>`;
+        });
+    });
+});
+</script>
+
+</body>
+</html>
