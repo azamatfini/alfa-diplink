@@ -1,80 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Сбер - Перевод в Узбекистан</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Тест deeplink Сбер</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { display: block; margin: 10px 0; padding: 10px; width: 100%; }
+    </style>
 </head>
 <body>
-<h2>Тестирование deeplink с предзаполнением Узбекистана</h2>
+    <h1>Тестирование deeplink для Сбера</h1>
 
-<script>
-const links = [
-    // Базовый deeplink с параметром страны UZ
-    "sberbankonline://transfers/overseas?recipient%3Acountry=UZ",
-    
-    // С параметрами страны и телефона
-    "sberbankonline://transfers/overseas?recipient%3Acountry=UZ&recipient%3AphoneNumber=%2B998381916876",
-    
-    // Полный deeplink с известными параметрами
-    "sberbankonline://transfers/overseas?recipient%3Acountry=UZ&recipient%3AphoneNumber=%2B998381916876&recipient%3Abank=ASACUZ22&requisite%3AtransferAmount=1000",
-    
-    // Альтернативные схемы с параметром страны
-    "onlineappmobile://sbolonline/transfers/overseas?recipient%3Acountry=UZ",
-    "sbolonline://transfers/overseas?recipient%3Acountry=UZ",
-    
-    // Android intent с параметрами
-    "intent://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end",
-    "intent://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ&recipient%3AphoneNumber=%2B998381916876#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end",
-    
-    // Android App Links
-    "android-app://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ"
-];
+    <div>
+        <h2>Без параметров (проверка работы схем)</h2>
+        <button onclick="openLink('sberbankonline://transfers/overseas')">sberbankonline://transfers/overseas</button>
+        <button onclick="openLink('sbolonline://transfers/overseas')">sbolonline://transfers/overseas</button>
+        <button onclick="openLink('onlineappmobile://sbolonline/transfers/overseas')">onlineappmobile://sbolonline/transfers/overseas</button>
+        <button onclick="openLink('intent://ru.sberbankmobile/transfers/overseas#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end')">Intent для Android</button>
+        <button onclick="openLink('android-app://ru.sberbankmobile/transfers/overseas')">android-app://ru.sberbankmobile/transfers/overseas</button>
+    </div>
 
-let currentIndex = 0;
+    <div>
+        <h2>С параметрами (UZ)</h2>
+        <button onclick="openLink('sberbankonline://transfers/overseas?recipient%3Acountry=UZ')">sberbankonline с страной UZ</button>
+        <button onclick="openLink('sbolonline://transfers/overseas?recipient%3Acountry=UZ')">sbolonline с страной UZ</button>
+        <button onclick="openLink('intent://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end')">Intent с страной UZ</button>
+    </div>
 
-function tryNextLink() {
-    if (currentIndex >= links.length) {
-        document.getElementById('status').innerHTML = '<p>Все ссылки протестированы!</p>';
-        return;
-    }
-    
-    const link = links[currentIndex];
-    document.getElementById('status').innerHTML = 
-        `<p>Попытка ${currentIndex + 1}/${links.length}:</p>
-         <code>${link}</code>`;
-    
-    console.log(`Попытка открыть: ${link}`);
-    window.location.href = link;
-    
-    currentIndex++;
-    setTimeout(tryNextLink, 1000);
-}
+    <div>
+        <h2>С параметрами (UZ, телефон, банк, сумма)</h2>
+        <button onclick="openLink('sberbankonline://transfers/overseas?recipient%3Acountry=UZ&recipient%3AphoneNumber=%2B998381916876&recipient%3Abank=ASACUZ22&requisite%3AtransferAmount=1000')">Полный набор параметров</button>
+    </div>
 
-// Запускаем тестирование по клику
-document.getElementById('startBtn').addEventListener('click', tryNextLink);
-</script>
+    <div id="message" style="margin-top: 20px; color: green;"></div>
 
-<button id="startBtn">Начать тестирование deeplink'ов</button>
-<div id="status" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+    <script>
+        function openLink(link) {
+            document.getElementById('message').textContent = 'Пытаемся открыть: ' + link;
+            window.location.href = link;
+            
+            // Если приложение не установлено, через 2 секунды покажем сообщение
+            setTimeout(function() {
+                document.getElementById('message').textContent += ' \n Возможно, приложение не установлено.';
+            }, 2000);
+        }
+    </script>
 
-<div style="margin-top: 30px;">
-    <h3>Инструкция:</h3>
-    <ol>
-        <li>Нажмите кнопку "Начать тестирование"</li>
-        <li>Разрешите открытие приложения СберБанка</li>
-        <li>Проверьте, какие параметры подставились</li>
-        <li>Вернитесь в браузер для тестирования следующей ссылки</li>
-    </ol>
-    
-    <h3>Тестируемые параметры:</h3>
-    <ul>
-        <li><strong>Страна:</strong> UZ (Узбекистан)</li>
-        <li><strong>Телефон:</strong> +998381916876</li>
-        <li><strong>Банк:</strong> ASACUZ22 (Asia Alliance Bank)</li>
-        <li><strong>Сумма:</strong> 1000</li>
-    </ul>
-</div>
-
+    <p>Если приложение не открывается, убедитесь, что оно установлено. <a href="https://www.sberbank.com/ru/person/dist_services/sberbankonline">Ссылка на приложение СберБанк</a></p>
 </body>
 </html>
