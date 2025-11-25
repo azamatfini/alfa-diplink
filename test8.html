@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сбер - Android App Links</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+button { 
+    padding: 10px 15px; 
+    margin: 5px; 
+    background: #21a038; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    display: block;
+    width: 200px;
+}
+button:hover { background: #1a8030; }
+.link-group { margin: 20px 0; padding: 15px; border: 2px solid #21a038; border-radius: 5px; background: #f8fff9; }
+.code { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 12px; }
+.status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+.success { background: #d4edda; color: #155724; }
+.info { background: #d1ecf1; color: #0c5460; }
+</style>
+</head>
+<body>
+<h1>Тестирование Android App Links для Сбера</h1>
+<p>Фокусируемся на рабочей схеме: <code>android-app://</code></p>
+
+<div class="link-group">
+    <h3>1. Базовые ссылки Android App</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas')">Тест: Базовый</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/payments/p2p</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/payments/p2p')">Тест: P2P переводы</button>
+</div>
+
+<div class="link-group">
+    <h3>2. С параметрами через путь</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/UZ</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas/UZ')">Тест: Путь + страна</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas/UZ/ASACUZ22</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas/UZ/ASACUZ22')">Тест: Путь + страна + банк</button>
+</div>
+
+<div class="link-group">
+    <h3>3. С параметрами через query string</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?country=UZ</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas?country=UZ')">Тест: Query страна</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?country=UZ&phone=998381916876</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas?country=UZ&phone=998381916876')">Тест: Query страна + телефон</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipientCountry=UZ&recipientBank=ASACUZ22&phoneNumber=998381916876&amount=1000</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas?recipientCountry=UZ&recipientBank=ASACUZ22&phoneNumber=998381916876&amount=1000')">Тест: Все параметры</button>
+</div>
+
+<div class="link-group">
+    <h3>4. Альтернативные форматы параметров</h3>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas?recipient%3Acountry=UZ')">Тест: Encoded параметры</button>
+    
+    <div class="code">android-app://ru.sberbankmobile/transfers/overseas?data=country:UZ;bank:ASACUZ22;phone:998381916876</div>
+    <button onclick="testLink('android-app://ru.sberbankmobile/transfers/overseas?data=country:UZ;bank:ASACUZ22;phone:998381916876')">Тест: Data строка</button>
+</div>
+
+<div class="link-group">
+    <h3>5. Intent с android-app схемой</h3>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas?country=UZ#Intent;scheme=android-app;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink('intent://ru.sberbankmobile/transfers/overseas?country=UZ#Intent;scheme=android-app;package=ru.sberbankmobile;end')">Тест: Intent + android-app</button>
+</div>
+
+<div id="status" class="status info">
+    <p><strong>Инструкция:</strong></p>
+    <ul>
+        <li>Нажимайте на кнопки по порядку</li>
+        <li>Записывайте, какие ссылки открывают Сбер</li>
+        <li>Отмечайте, какие параметры подставляются</li>
+        <li>Если приложение открывается на главный экран - параметры не работают</li>
+        <li>Если открывается на экран перевода - тестируйте дальше</li>
+    </ul>
+</div>
+
+<script>
+function testLink(link) {
+    const status = document.getElementById('status');
+    status.className = 'status info';
+    status.innerHTML = `<p>Открываем: <code>${link}</code></p>`;
+    
+    console.log('Opening android-app link:', link);
+    
+    // Создаем iframe для открытия ссылки (обход блокировок)
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = link;
+    document.body.appendChild(iframe);
+    
+    // Также пробуем стандартный метод
+    setTimeout(() => {
+        window.location.href = link;
+    }, 100);
+    
+    // Удаляем iframe через секунду
+    setTimeout(() => {
+        document.body.removeChild(iframe);
+    }, 1000);
+}
+
+// Копирование ссылок по клику
+document.querySelectorAll('.code').forEach(codeElement => {
+    codeElement.style.cursor = 'pointer';
+    codeElement.title = 'Нажмите для копирования';
+    codeElement.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.innerHTML = `<p>Ссылка скопирована: <code>${text}</code></p>`;
+        });
+    });
+});
+</script>
+
+</body>
+</html>
