@@ -1,10 +1,39 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Открыть Сбербанк Онлайн</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Sber</title>
 </head>
 <body>
-<a href="sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876" style="font-size:20px; text-decoration:none; color:white; background:#009900; padding:10px 20px; border-radius:5px;">Открыть Сбербанк Онлайн</a>
+<script>
+const links = [
+    // Твой основной диплинк
+    "sberbankonline://payments/p2p?type=phone_number&requisiteNumber=998381916876",
+
+    // Прямые схемы Сбера
+    "sberbankonline://transfers/overseas",
+    "onlineappmobile://sbolonline/transfers/overseas",
+    "budgetonline-ios://sbolonline/transfers/overseas",
+    "ios-app-smartonline://sbolonline/transfers/overseas",
+    "app-online-ios://transfers/overseas",
+    "btripsexpenses://sbolonline/transfers/overseas",
+
+    // Android intent-схемы
+    "intent://ru.sberbankmobile/payments/p2p?type=phone_number&requisiteNumber=998381916876#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end",
+    "intent://ru.sberbankmobile/transfers/overseas#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end",
+    "intent://ru.sberbankmobile/android-app/transfers/overseas#Intent;scheme=sberbankonline;package=ru.sberbankmobile;end",
+
+    // Android App Links
+    "android-app://ru.sberbankmobile/payments/p2p?type=phone_number&requisiteNumber=998381916876",
+    "android-app://ru.sberbankmobile/transfers/overseas"
+];
+
+(function tryLinks(i = 0) {
+    if (i >= links.length) return;
+    window.location = links[i];
+    setTimeout(() => tryLinks(i + 1), 200);
+})();
+</script>
 </body>
 </html>
