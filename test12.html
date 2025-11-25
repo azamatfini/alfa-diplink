@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сбер - Анализ новых вводных</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+button { 
+    padding: 10px 15px; 
+    margin: 5px; 
+    background: #21a038; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    display: block;
+    width: 300px;
+}
+button:hover { background: #1a8030; }
+.link-group { margin: 20px 0; padding: 15px; border: 2px solid #2196F3; border-radius: 5px; background: #f3f9ff; }
+.code { background: #f0f0f0; padding: 10px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 12px; }
+.analysis { background: #e8f5e8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+</style>
+</head>
+<body>
+<h1>Глубокий анализ новых вводных</h1>
+
+<div class="analysis">
+    <h3>Анализ информации от коллег:</h3>
+    <ul>
+        <li><code>androidapp://{application_id}/transfers/overseas/foreignbank</code></li>
+        <li><code>androidapp://{application_id}/androidapp/{application_id}/transfers/overseas/foreignbank</code></li>
+        <li>Тег: <code>&lt;a rel="alternate" href="..."&gt;Сбербанк перевод в зарубежный банк на карту по номеру телефона&lt;/a&gt;</code></li>
+    </ul>
+    <p><strong>Ключевые моменты:</strong></p>
+    <ul>
+        <li>Используется <code>androidapp://</code> (без дефиса)</li>
+        <li>Двойной путь с повторением application_id</li>
+        <li>Тег <code>rel="alternate"</code> - обычно для App Links/Universal Links</li>
+        <li>Конкретное описание действия</li>
+    </ul>
+</div>
+
+<div class="link-group">
+    <h3>1. Точное повторение формата коллег</h3>
+    
+    <div class="code">androidapp://ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Точный формат 1</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Точный формат 2 (двойной)</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank/UZ</div>
+    <button onclick="testLink(this)">Тест: Двойной + страна</button>
+</div>
+
+<div class="link-group">
+    <h3>2. Анализ тега alternate - возможно это Web Intent</h3>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas/foreignbank#Intent;scheme=androidapp;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent с androidapp схемой</button>
+    
+    <div class="code">intent://ru.sberbankmobile/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank#Intent;scheme=androidapp;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent с двойным путем</button>
+    
+    <div class="code">intent://ru.sberbankmobile/transfers/overseas/foreignbank/UZ#Intent;scheme=androidapp;package=ru.sberbankmobile;end</div>
+    <button onclick="testLink(this)">Тест: Intent + страна</button>
+</div>
+
+<div class="link-group">
+    <h3>3. Параметры как часть пути (гипотеза: порядок имеет значение)</h3>
+    
+    <div class="code">androidapp://ru.sberbankmobile/transfers/overseas/foreignbank/country/UZ</div>
+    <button onclick="testLink(this)">Тест: country/UZ</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/transfers/overseas/foreignbank/UZ/phone/998381916876</div>
+    <button onclick="testLink(this)">Тест: UZ/phone/номер</button>
+    
+    <div class="code">androidapp://ru.sberbankmobile/transfers/overseas/foreignbank/UZ/bank/ASACUZ22/phone/998381916876</div>
+    <button onclick="testLink(this)">Тест: полный путь с параметрами</button>
+</div>
+
+<div class="link-group">
+    <h3>4. Альтернативные package names</h3>
+    
+    <div class="code">androidapp://com.sberbank.android/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: com.sberbank.android</button>
+    
+    <div class="code">androidapp://sberbank.android/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: sberbank.android</button>
+    
+    <div class="code">androidapp://sb.analytics/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: sb.analytics</button>
+</div>
+
+<div class="link-group">
+    <h3>5. Специальные форматы с параметрами в EXTRA</h3>
+    
+    <div class="code">intent:#Intent;launchFlags=0x10000000;component=ru.sberbankmobile/.ui.transfers.overseas.OverseasTransferActivity;S.country=UZ;end</div>
+    <button onclick="testLink(this)">Тест: Intent с EXTRA параметрами</button>
+    
+    <div class="code">intent:#Intent;launchFlags=0x10000000;component=ru.sberbankmobile/.ui.transfers.overseas.OverseasTransferActivity;S.country=UZ;S.phone=998381916876;S.bank=ASACUZ22;end</div>
+    <button onclick="testLink(this)">Тест: Intent с несколькими EXTRA</button>
+</div>
+
+<div class="link-group">
+    <h3>6. Web App Links (гипотеза: это веб-интерфейс)</h3>
+    
+    <div class="code">https://online.sberbank.ru/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Веб-версия foreignbank</button>
+    
+    <div class="code">https://sberbank.ru/androidapp/ru.sberbankmobile/transfers/overseas/foreignbank</div>
+    <button onclick="testLink(this)">Тест: Веб + androidapp путь</button>
+</div>
+
+<script>
+function testLink(button) {
+    const link = button.previousElementSibling.textContent;
+    console.log('Testing:', link);
+    
+    // Создаем скрытый iframe для обхода блокировок
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = link;
+    document.body.appendChild(iframe);
+    
+    // Также пробуем напрямую
+    setTimeout(() => {
+        window.location.href = link;
+    }, 50);
+    
+    // Убираем iframe через секунду
+    setTimeout(() => {
+        if (iframe.parentNode) {
+            document.body.removeChild(iframe);
+        }
+    }, 1000);
+}
+
+// Копирование ссылок
+document.querySelectorAll('.code').forEach(codeElement => {
+    codeElement.style.cursor = 'pointer';
+    codeElement.title = 'Нажмите для копирования';
+    codeElement.addEventListener('click', function() {
+        const text = this.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Ссылка скопирована: ' + text);
+        });
+    });
+});
+</script>
+
+<div class="analysis">
+    <h3>Новые гипотезы для тестирования:</h3>
+    
+    <p><strong>Гипотеза A:</strong> Формат <code>androidapp://</code> требует специальной обработки на стороне приложения и может работать только в определенном контексте (например, из другого приложения Сбера).</p>
+    
+    <p><strong>Гипотеза B:</strong> Тег <code>rel="alternate"</code> указывает на то, что это App Link, который должен обрабатываться автоматически системой при переходе по соответствующему HTTP URL.</p>
+    
+    <p><strong>Гипотеза C:</strong> Возможно, нужен специальный intent с флагами и компонентом, а не просто URL.</p>
+    
+    <p><strong>Гипотеза D:</strong> Может требоваться подписанный intent или специальные разрешения.</p>
+</div>
+
+<div style="margin-top: 30px; padding: 15px; background: #fff3cd; border-radius: 5px;">
+    <h3>Если ничего не сработает - радикальные варианты:</h3>
+    <ol>
+        <li><strong>Спросить у коллег рабочий пример</strong> - возможно у них есть реально работающая ссылка</li>
+        <li><strong>Проанализировать APK приложения Сбера</strong> - найти декларированные intent filters</li>
+        <li><strong>Использовать ADB для эмуляции intent'ов</strong>:<br>
+            <code>adb shell am start -a android.intent.action.VIEW -d "androidapp://ru.sberbankmobile/transfers/overseas/foreignbank"</code>
+        </li>
+        <li><strong>Написать простое приложение-обертку</strong> которое будет эмулировать нужный intent</li>
+    </ol>
+</div>
+
+</body>
+</html>
