@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перевод через Сбер</title>
+</head>
+<body>
+
+<script>
+    function getParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+
+    const country = getParam("country") || "UZ";
+    const bank = getParam("bank") || "ASACUZ22";
+    const phone = getParam("phone") || "998381916876";
+    const amount = getParam("amount") || "";
+
+    // Формируем диплинк (хоть Сбер не принимает — мы делаем попытку на случай будущей поддержки)
+    const deepLink =
+        "sberbankonline://transfers/overseas?" +
+        "country=" + country +
+        "&bank=" + bank +
+        "&phone=" + phone +
+        "&amount=" + amount;
+
+    // Автопереход
+    window.location.href = deepLink;
+
+</script>
+
+<h2>Если перенаправление не сработало — нажмите:</h2>
+<a id="link" href="#">Открыть в Сбере</a>
+
+<script>
+    document.getElementById("link").href = deepLink;
+</script>
+
+</body>
+</html>
