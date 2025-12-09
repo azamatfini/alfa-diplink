@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование диплинков ВТБ - Перевод на карту</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #14327C;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(20, 50, 124, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #14327C 0%, #1a3b8f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .card-number {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        
+        .section {
+            padding: 25px;
+            border-bottom: 1px solid #eef1f7;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #14327C;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-style: normal;
+            background: #14327C;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .link-group {
+            margin-bottom: 20px;
+        }
+        
+        .link-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .link-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .link-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e1e5f1;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            background: #f8fafd;
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .link-input:focus {
+            outline: none;
+            border-color: #14327C;
+            background: white;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background: #14327C;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn:hover {
+            background: #1a3b8f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(20, 50, 124, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-copy {
+            background: #27ae60;
+        }
+        
+        .btn-copy:hover {
+            background: #2ecc71;
+        }
+        
+        .btn-test {
+            background: #e74c3c;
+        }
+        
+        .btn-test:hover {
+            background: #c0392b;
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .status-success {
+            border-left: 5px solid #27ae60;
+        }
+        
+        .status-error {
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .instructions {
+            background: #f8fafd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #14327C;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .link-box {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .link-input {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Тестирование диплинков ВТБ</h1>
+            <p>Перевод по номеру карты</p>
+            <div class="card-number">2202208192285527</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i>1</i> Основные схемы VTB
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Базовый диплинк с параметром карты:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb://transfers/transferByCard?defaultTargetAccountId=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Через путь /i/c2c с параметром:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb://i/c2c?card=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Карта как часть пути:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb://transfer/card/2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">С параметром number:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb://transfer/card?number=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i>2</i> Android-специфичные ссылки
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Android App Link (полный):</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="android-app://ru.vtb24.mobilebanking/transfers/transferByCard?defaultTargetAccountId=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Android App Link (альтернативный путь):</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="android-app://ru.vtb24.mobilebanking/i/c2c?card=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Intent схема (Android):</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="intent://transfers/transferByCard?defaultTargetAccountId=2202208192285527#Intent;scheme=vtb;package=ru.vtb24.mobilebanking;end">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i>3</i> Полные параметры (как веб-версия)
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Все параметры как в веб-версии:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb://transfers/transferByCard?isStandaloneScenario=true&actionType=generalTargetSearch&defaultTargetAccountId=2202208192285527&tab=SWITCH_TO_OP_3515">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i>4</i> Альтернативные схемы
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Схема vtbonline://:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtbonline://transfers/transferByCard?defaultTargetAccountId=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Схема vtb24://:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="vtb24://transfer/card/2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+            
+            <div class="link-group">
+                <div class="link-label">Схема package://:</div>
+                <div class="link-box">
+                    <input type="text" readonly class="link-input" value="ru.vtb24.mobilebanking://transfers/transferByCard?defaultTargetAccountId=2202208192285527">
+                    <button class="btn btn-copy" onclick="copyLink(this)">Копировать</button>
+                    <button class="btn btn-test" onclick="testLink(this)">Тест</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Инструкция по тестированию:</h3>
+            <ul>
+                <li><strong>Копировать</strong> - копирует ссылку в буфер обмена</li>
+                <li><strong>Тест</strong> - пытается открыть ссылку в приложении ВТБ</li>
+                <li>Если появится диалог "Открыть в приложении?" - выберите ВТБ</li>
+                <li>Если ничего не происходит, попробуйте другую схему</li>
+                <li>Для iOS попробуйте схемы vtb:// или vtbonline://</li>
+                <li>Для Android работают android-app:// и intent:// схемы</li>
+            </ul>
+            <p><strong>Примечание:</strong> Некоторые схемы могут не поддерживаться приложением ВТБ. Тестируйте разные варианты.</p>
+        </div>
+    </div>
+    
+    <div id="statusBar" class="status-bar">
+        <span id="statusText">Статус</span>
+    </div>
+
+    <script>
+        // Показать статус
+        function showStatus(message, type = 'success') {
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            
+            statusText.textContent = message;
+            statusBar.className = `status-bar status-${type}`;
+            statusBar.style.display = 'flex';
+            
+            setTimeout(() => {
+                statusBar.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Копирование ссылки
+        function copyLink(button) {
+            const input = button.parentElement.querySelector('.link-input');
+            const text = input.value;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('Ссылка скопирована в буфер обмена', 'success');
+                
+                // Визуальная обратная связь
+                button.innerHTML = '✓ Скопировано';
+                button.style.background = '#27ae60';
+                
+                setTimeout(() => {
+                    button.innerHTML = 'Копировать';
+                    button.style.background = '';
+                }, 1500);
+            }).catch(err => {
+                showStatus('Ошибка копирования', 'error');
+                console.error('Ошибка копирования:', err);
+            });
+        }
+        
+        // Тестирование ссылки
+        function testLink(button) {
+            const input = button.parentElement.querySelector('.link-input');
+            const link = input.value;
+            
+            console.log('Тестируем ссылку:', link);
+            
+            // Визуальная обратная связь
+            const originalText = button.innerHTML;
+            button.innerHTML = '↗ Открываю...';
+            button.style.background = '#f39c12';
+            
+            // Пробуем открыть ссылку
+            try {
+                // Создаем невидимый iframe для обхода блокировок браузера
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = link;
+                document.body.appendChild(iframe);
+                
+                // Также пробуем напрямую
+                setTimeout(() => {
+                    window.location.href = link;
+                }, 50);
+                
+                // Убираем iframe через секунду
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 1000);
+                
+                showStatus('Пытаемся открыть ссылку в приложении ВТБ...', 'success');
+                
+                // Если через 2 секунды мы все еще на странице, значит ссылка не сработала
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        showStatus('Ссылка не открылась. Попробуйте другую схему.', 'error');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                showStatus('Ошибка при открытии ссылки', 'error');
+                console.error('Ошибка:', error);
+            }
+            
+            // Восстанавливаем кнопку через 2 секунды
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+        
+        // Добавляем возможность копирования по клику на поле ввода
+        document.querySelectorAll('.link-input').forEach(input => {
+            input.addEventListener('click', function() {
+                this.select();
+                navigator.clipboard.writeText(this.value).then(() => {
+                    showStatus('Ссылка скопирована', 'success');
+                });
+            });
+        });
+        
+        // Показываем уведомление при загрузке страницы
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                showStatus('Готово к тестированию диплинков ВТБ', 'success');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
