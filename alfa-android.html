@@ -6,15 +6,14 @@
 <title>Открыть Альфа-Банк</title>
 <script>
   window.location.href =
-    "intent://phone_bank_transfers" +
+    "alfabank://phone_bank_transfers" +
     "?openSelectRecipientPicker=true" +
-    "&recipientPhoneNumber=992920001367" +
-    "#Intent;scheme=alfabank;package=ru.alfabank.mobile.android;end";
+    "&recipientPhoneNumber=992920001367";
 </script>
 </head>
 <body>
-<p>Если приложение не открылось:</p>
-<a href="intent://phone_bank_transfers?openSelectRecipientPicker=true&recipientPhoneNumber=992920001367#Intent;scheme=alfabank;package=ru.alfabank.mobile.android;end">
+<p>Если приложение не открылось автоматически:</p>
+<a href="alfabank://phone_bank_transfers?openSelectRecipientPicker=true&recipientPhoneNumber=992920001367">
 Открыть в Альфа-Банке
 </a>
 </body>
